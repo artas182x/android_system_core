@@ -53,3 +53,45 @@ $(DIRS):
 	@mkdir -p $@
 
 ALL_PREBUILT += $(DIRS)
+
+file := $(TARGET_ROOT_OUT)/sbin/bigmemcheck
+$(file) : $(LOCAL_PATH)/sbin/bigmemcheck | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+$(INSTALLED_RAMDISK_TARGET): $(file)
+
+file := $(TARGET_ROOT_OUT)/sbin/fancyinit1
+$(file) : $(LOCAL_PATH)/sbin/fancyinit1 | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+$(INSTALLED_RAMDISK_TARGET): $(file)
+
+file := $(TARGET_ROOT_OUT)/sbin/fancyinit2
+$(file) : $(LOCAL_PATH)/sbin/fancyinit2 | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+$(INSTALLED_RAMDISK_TARGET): $(file)
+
+file := $(TARGET_ROOT_OUT)/sbin/media_profiles.xml
+$(file) : $(LOCAL_PATH)/sbin/media_profiles.xml | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+$(INSTALLED_RAMDISK_TARGET): $(file)
+
+file := $(TARGET_ROOT_OUT)/sbin/power.tuna.so
+$(file) : $(LOCAL_PATH)/sbin/power.tuna.so | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+$(INSTALLED_RAMDISK_TARGET): $(file)
+
+file := $(TARGET_ROOT_OUT)/sbin/binaries/busybox
+$(file) : $(LOCAL_PATH)/sbin/binaries/busybox | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+$(INSTALLED_RAMDISK_TARGET): $(file)
+
+file := $(TARGET_ROOT_OUT)/sbin/binaries/tune2fs
+$(file) : $(LOCAL_PATH)/sbin/binaries/tune2fs | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+$(INSTALLED_RAMDISK_TARGET): $(file)
