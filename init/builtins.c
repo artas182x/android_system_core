@@ -15,6 +15,7 @@
  */
 
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -54,6 +55,7 @@
 void add_environment(const char *name, const char *value);
 
 extern int init_module(void *, unsigned long, const char *);
+extern int init_export_rc_file(const char *);
 
 static int write_file(const char *path, const char *value)
 {
@@ -221,6 +223,23 @@ int do_class_reset(int nargs, char **args)
     return 0;
 }
 
+int do_export_rc(int nargs, char **args)
+{
+        /* Import environments from a specified file.
+         * The file content is of the form:
+         *     export <env name> <value>
+         * e.g.
+         *     export LD_PRELOAD /system/lib/xyz.so
+         *     export PROMPT abcde
+         * Differences between "import" and "export_rc":
+         * 1) export_rc can only import environment vars
+         * 2) export_rc is performed when the command
+         *    is executed rather than at the time the
+         *    command is parsed (i.e. "import")
+         */
+    return init_export_rc_file(args[1]);
+}
+
 int do_domainname(int nargs, char **args)
 {
     return write_file("/proc/sys/kernel/domainname", args[1]);
@@ -354,6 +373,38 @@ int do_mkdir(int nargs, char **args)
 
     return 0;
 }
+
+int do_mknod(int nargs, char **args)
+{
+    dev_t dev;
+    int major;
+    int minor;
+    int mode;
+
+    /* mknod <path> <type> <major> <minor> */
+
+    if (nargs != 5) {
+        return -1;
+    }
+
+    major = strtoul(args[3], 0, 0);
+    minor = strtoul(args[4], 0, 0);
+    dev = (major << 8) | minor;
+
+    if (strcmp(args[2], "c") == 0) {
+        mode = S_IFCHR;
+    } else {
+        mode = S_IFBLK;
+    }
+    if (mknod(args[1], mode, dev)) {
+        ERROR("init: mknod failed");
+        return -1;
+    }
+
+    return 0;
+}
+
+
 
 static struct {
     const char *name;
@@ -859,12 +910,24 @@ int do_chmod(int nargs, char **args) {
 
 int do_restorecon(int nargs, char **args) {
     int i;
+    int ret = 0;
 
     for (i = 1; i < nargs; i++) {
         if (restorecon(args[i]) < 0)
-            return -errno;
+            ret = -errno;
     }
-    return 0;
+    return ret;
+}
+
+int do_restorecon_recursive(int nargs, char **args) {
+    int i;
+    int ret = 0;
+
+    for (i = 1; i < nargs; i++) {
+        if (restorecon_recursive(args[i]) < 0)
+            ret = -errno;
+    }
+    return ret;
 }
 
 int do_setsebool(int nargs, char **args) {
