@@ -19,6 +19,8 @@ LOCAL_SRC_FILES := \
     libaudit.c \
     LogAudit.cpp
 
+LOCAL_CFLAGS += -fno-strict-aliasing
+
 LOCAL_SHARED_LIBRARIES := \
     libsysutils \
     liblog \
