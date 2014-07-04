@@ -576,9 +576,6 @@ int fs_mgr_mount_all(struct fstab *fstab)
     int encrypted = 0;
     int ret = -1;
     int mret;
-#define MAX_FS_TYPES 5
-    const char *fs_types[MAX_FS_TYPES] = { "ext4", "f2fs", "vfat", "exfat", "ntfs" };
-    int j = 0;
 
     if (!fstab) {
         return ret;
@@ -613,26 +610,9 @@ int fs_mgr_mount_all(struct fstab *fstab)
             }
         }
 
-        if (strcmp(fstab->recs[i].fs_type, "auto")) {
-            /* We aren't trying to guess here so just mount it as usual */
-            mret = __mount(fstab->recs[i].blk_device, fstab->recs[i].mount_point,
-                           fstab->recs[i].fs_type, fstab->recs[i].flags,
-                           fstab->recs[i].fs_options);
-        } else {
-            /* Now we have a guessing game. Try until we succeed or we run
-             * out of filesystems, in which case we go to encryption handling */
-            for (; j < MAX_FS_TYPES; j++) {
-                mret = __mount(fstab->recs[i].blk_device, fstab->recs[i].mount_point,
-                               fs_types[j], fstab->recs[i].flags,
-                               fstab->recs[i].fs_options);
-                if (!mret) {
-                    /* Great! Lets get outta here */
-                    break;
-                }
-            }
-            /* Reset j to 0 in case we need to do this guessing game again later */
-            j = 0;
-        }
+        mret = __mount(fstab->recs[i].blk_device, fstab->recs[i].mount_point,
+                     fstab->recs[i].fs_type, fstab->recs[i].flags,
+                     fstab->recs[i].fs_options);
 
         if (!mret) {
             /* Success!  Go get the next one */
